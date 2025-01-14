@@ -194,7 +194,6 @@ void printLine(const char *line, int row, bool highlight) {
     if (highlight) attroff(COLOR_PAIR(1));
 }
 
-// Update keyInput function to handle installation and removal
 void keyInput(int *currIndex, int *startIndex, int *prevCh, int *exitFlag, int packageCount, Package *p) {
     int ch = getch();
     if (ch == 'g' && *prevCh == 'g') {
@@ -218,10 +217,10 @@ void keyInput(int *currIndex, int *startIndex, int *prevCh, int *exitFlag, int p
                 searchPackage();
                 break;
             case 'i':
-                managePackage(&p[*currIndex], true); // Install package
+                managePackage(&p[*currIndex], 0);
                 break;
             case 'd':
-                managePackage(&p[*currIndex], false); // Remove package
+                managePackage(&p[*currIndex], 1);
                 break;
             case 'q':
                 *exitFlag = 1;
@@ -239,7 +238,6 @@ void displayPackagesDetail(Package *package) {
     mvprintw(0, 0, "Package Details");
     mvhline(1, 0, '-', COLS);
 
-    // apt-cache command to fetch detailed package info
     char command[256];
     snprintf(command, sizeof(command), "apt-cache show %s", package->name);
 
@@ -307,7 +305,7 @@ void searchPackage() {
     char query[256];
     char command[512];
     char buffer[1024];
-    char packages[1024][256]; // 최대 1024개의 패키지 이름 저장 가능
+    char packages[1024][256];
     Package *p = NULL;
     int currIndex = 0, startIndex = 0, exitFlag = 0, prevCh = 0;
 
@@ -315,13 +313,12 @@ void searchPackage() {
     clrtoeol();
     echo();
 
-    getstr(query); // 사용자 입력 받기
+    getstr(query);
     noecho();
     clear();
     mvprintw(0, 0, "Search results for '%s':", query);
     mvhline(1, 0, '-', COLS);
 
-    // 명령어 생성
     snprintf(command, sizeof(command), "apt search %s 2>/dev/null", query);
 
     FILE *fp = popen(command, "r");
@@ -333,7 +330,6 @@ void searchPackage() {
         return;
     }
 
-    // 검색 결과 처리
     bool isPackageLine = true;
     while (fgets(buffer, sizeof(buffer), fp)) {
         if (strstr(buffer, "Sorting") || strstr(buffer, "Full Text Search") || strlen(buffer) <= 1) {
@@ -345,7 +341,7 @@ void searchPackage() {
             char *name = strtok(buffer, " /");
             if (name && count < 1024) {
                 strncpy(packages[count], name, sizeof(packages[count]) - 1);
-                packages[count][sizeof(packages[count]) - 1] = '\0'; // Null-terminate
+                packages[count][sizeof(packages[count]) - 1] = '\0'; 
                 count++;
             }
             isPackageLine = false;
@@ -355,7 +351,6 @@ void searchPackage() {
     }
     pclose(fp);
 
-    // 패키지 구조체 배열 메모리 할당
     p = (Package *)malloc(count * sizeof(Package));
     if (!p) {
         mvprintw(2, 0, "Memory allocation failed.");
@@ -364,7 +359,6 @@ void searchPackage() {
         return;
     }
 
-    // 각 패키지 이름을 이용해 정보 추출
     for (int i = 0; i < count; i++) {
         snprintf(command, sizeof(command), "apt show %s 2>/dev/null", packages[i]);
         FILE *fp = popen(command, "r");
@@ -399,7 +393,6 @@ void searchPackage() {
         }
     }
 
-    // 패키지 목록 출력 및 키 입력 처리
     while (!exitFlag) {
         if (currIndex < startIndex) {
             startIndex = currIndex;
@@ -410,7 +403,6 @@ void searchPackage() {
         keyInput(&currIndex, &startIndex, &prevCh, &exitFlag, count, p);
     }
 
-    // 메모리 해제
     for (int i = 0; i < count; i++) {
         safeFree(&p[i].name);
         safeFree(&p[i].version);
@@ -419,21 +411,20 @@ void searchPackage() {
     free(p);
 }
 
-// Install or remove the selected package
 void managePackage(Package *package, int action) {
     char command[256];
     clear();
 
     switch (action) {
-        case 0: // 패키지 설치
+        case 0: 
             snprintf(command, sizeof(command), "sudo apt-get install -y %s 2>&1", package->name);
             mvprintw(0, 0, "Installing package: %s", package->name);
             break;
-        case 1: // 패키지 제거
+        case 1: 
             snprintf(command, sizeof(command), "sudo apt-get remove -y %s 2>&1", package->name);
             mvprintw(0, 0, "Removing package: %s", package->name);
             break;
-        case 2: // 시스템 업데이트 및 업그레이드
+        case 2: 
             snprintf(command, sizeof(command), "sudo apt-get update && sudo apt-get upgrade -y");
             mvprintw(0, 0, "Updating and upgrading the system...");
             break;
