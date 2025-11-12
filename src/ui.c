@@ -4,8 +4,16 @@
 #include <sys/ioctl.h>
 #include "ui.h"
 #include "utils.h"
+#include "constants.h"
 
 void displayPackages(Package *p, int packageCount, int startIndex, int currentIndex) {
+    if (!p || packageCount <= 0) {
+        erase();
+        mvprintw(0, 0, "No packages to display.");
+        refresh();
+        return;
+    }
+
     erase();
 
     int maxNameLen, maxVersionLen;
@@ -30,7 +38,7 @@ void displayPackages(Package *p, int packageCount, int startIndex, int currentIn
                  maxVersionLen, p[i].version);
         strncat(line, p[i].description, maxDescLen);
 
-        if (strlen(p[i].description) > maxDescLen) {
+        if (strlen(p[i].description) > (size_t)maxDescLen) {
             line[COLS - 1] = '>';
         }
         printLine(line, 2 + (i - startIndex), i == currentIndex);
@@ -40,12 +48,32 @@ void displayPackages(Package *p, int packageCount, int startIndex, int currentIn
 }
 
 void displayPackagesDetail(Package *package) {
+    if (!package) {
+        clear();
+        mvprintw(0, 0, "Error: Invalid package");
+        mvprintw(ROWS - 1, 0, "Press any key to return.");
+        refresh();
+        getch();
+        clear();
+        return;
+    }
+
     clear();
+
+    // 패키지 이름 검증
+    if (!isValidPackageName(package->name)) {
+        mvprintw(0, 0, "Error: Invalid package name '%s'", package->name);
+        mvprintw(ROWS - 1, 0, "Press any key to return.");
+        refresh();
+        getch();
+        clear();
+        return;
+    }
 
     mvprintw(0, 0, "Package Details");
     mvhline(1, 0, '-', COLS);
 
-    char command[256];
+    char command[COMMAND_SIZE];
     snprintf(command, sizeof(command), "apt-cache show %s", package->name);
 
     FILE *fp = popen(command, "r");
@@ -56,20 +84,20 @@ void displayPackagesDetail(Package *package) {
         return;
     }
 
-    char buffer[1024];
-    char lines[1000][1024];
+    char buffer[BUFFER_SIZE];
+    char lines[MAX_LINES][BUFFER_SIZE];
     int lineCount = 0;
 
-    while (fgets(buffer, sizeof(buffer), fp) != NULL && lineCount < 1000) {
+    while (fgets(buffer, sizeof(buffer), fp) != NULL && lineCount < MAX_LINES) {
         size_t len = strlen(buffer);
-        if (len > COLS) {
+        if ((int)len > COLS) {
             int start = 0;
-            while (start < len) {
+            while (start < (int)len) {
                 strncpy(lines[lineCount], &buffer[start], COLS - 1);
                 lines[lineCount][COLS - 1] = '\0';
                 lineCount++;
                 start += COLS - 1;
-                if (lineCount >= 1000) break;
+                if (lineCount >= MAX_LINES) break;
             }
         } else {
             strncpy(lines[lineCount++], buffer, sizeof(buffer));

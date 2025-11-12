@@ -1,6 +1,6 @@
 # 컴파일러 및 옵션 설정
 CC = gcc
-CFLAGS = 
+CFLAGS = -Wall -Wextra -O2 -std=c11
 LDFLAGS = -lncurses
 
 # 실행 파일 이름
