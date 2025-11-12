@@ -4,11 +4,19 @@
 #include "constants.h"
 #include <string.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 int main(int argc, char *argv[]) {
-    if (argc > 1 && strcmp(argv[1], "-help") == 0) {
-        printHelp();
-        return EXIT_SUCCESS;
+    bool autoUpdate = false;
+
+    // 명령행 인자 파싱
+    for (int i = 1; i < argc; i++) {
+        if (strcmp(argv[i], "-help") == 0 || strcmp(argv[i], "--help") == 0) {
+            printHelp();
+            return EXIT_SUCCESS;
+        } else if (strcmp(argv[i], "--auto-update") == 0 || strcmp(argv[i], "-U") == 0) {
+            autoUpdate = true;
+        }
     }
     
     int packageCount, currIndex = 0, startIndex = 0, prevCh = 0, exitFlag = 0;
@@ -16,8 +24,11 @@ int main(int argc, char *argv[]) {
 
     init();
     
-    // 시스템 업데이트 (선택 사항)
-    managePackage(NULL, ACTION_UPDATE);
+    // 선택적 자동 시스템 업데이트 (사용자가 명령행 옵션으로 요청한 경우)
+    if (autoUpdate) {
+        managePackage(NULL, ACTION_UPDATE);
+    }
+    // 기본 동작: 시작 시 업데이트 수행 안 함. 'u' 키로 명시적 실행.
     
     packageCount = loadPackages(&packages);
     if (packageCount <= 0) {

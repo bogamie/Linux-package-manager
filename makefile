@@ -4,7 +4,7 @@ CFLAGS = -Wall -Wextra -O2 -std=c11
 LDFLAGS = -lncurses
 
 # 실행 파일 이름
-TARGET = main
+TARGET = package_manager
 
 # 소스 파일 및 오브젝트 파일
 SRCDIR = src

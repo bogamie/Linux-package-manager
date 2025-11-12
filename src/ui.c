@@ -138,9 +138,10 @@ void displayPackagesDetail(Package *package) {
 void printHelp() {
     printf("Package Manager Program\n");
     printf("========================\n");
-    printf("Usage: ./main [options]\n");
+    printf("Usage: ./package_manager [options]\n");
     printf("\nOptions:\n");
-    printf("  -help                Show this help message and exit.\n");
+    printf("  -help, --help        Show this help message and exit.\n");
+    printf("  -U, --auto-update    Run system update & upgrade on startup (requires sudo).\n");
     printf("\nKeyboard Shortcuts:\n");
     printf("  j        Move down the package list.\n");
     printf("  k        Move up the package list.\n");
@@ -148,13 +149,13 @@ void printHelp() {
     printf("  gg       Jump to the top of the list.\n");
     printf("  i        Install the selected package.\n");
     printf("  d        Remove the selected package.\n");
-    printf("  u        Update and upgrade the system.\n");
+    printf("  u        Update and upgrade the system (sudo prompt when pressed).\n");
     printf("  /        Search for a package.\n");
     printf("  Enter    Show details of the selected package.\n");
     printf("  q        Quit the program.\n");
     printf("\nExample:\n");
-    printf("  ./main              Launch the program.\n");
-    printf("  ./main -help        Show this help message.\n");
+    printf("  ./package_manager              Launch the program.\n");
+    printf("  ./package_manager -help        Show this help message.\n");
 }
 
 void printLine(const char *line, int row, bool highlight) {
