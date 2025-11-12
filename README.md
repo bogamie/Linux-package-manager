@@ -6,220 +6,244 @@
 ![Language](https://img.shields.io/badge/language-C-green.svg)
 ![Platform](https://img.shields.io/badge/platform-Linux-orange.svg)
 
-**Debian/Ubuntu 터미널 패키지 매니저**
+**Terminal Package Manager for Debian/Ubuntu**
 
-[소개](#소개) • [기능](#기능) • [설치](#설치) • [사용법](#사용법) • [스크린샷](#스크린샷) • [보안](#보안) • [아키텍처](#아키텍처)
+[Introduction](#introduction) • [Features](#features) • [Installation](#installation) • [Usage](#usage) • [Screenshots](#screenshots) • [Security](#security) • [Architecture](#architecture)
 
 </div>
 
 ---
 
-## 📋 소개
+## 📋 Introduction <a name="introduction"></a>
 
-Linux Package Manager TUI는 Debian/Ubuntu 계열 리눅스에서 시스템 패키지를 사용자 친화적이고 안전하게 관리할 수 있는 터미널 기반 UI 애플리케이션입니다. C와 ncurses로 구현되어 가볍고 직관적이며, Vim 스타일의 키 바인딩과 화이트리스트 기반 입력 검증으로 보안까지 고려했습니다.
+**Linux Package Manager TUI** is a terminal-based UI application for managing system packages safely and efficiently on Debian/Ubuntu systems.
+Built in **C** using **ncurses**, it is lightweight, responsive, and secure — combining Vim-style navigation with strict whitelist-based input validation.
 
-주요 특징
-- 가벼운 설계: C + `-O2` 최적화를 활용한 단순하고 안정적인 동작
-- 보안 강화: 명령어 인젝션을 원천 차단하는 입력 검증
-- 사용성: j/k, gg/G, /, i, d, u 등 Vim 친화적 단축키
-- 구조적 설계: UI/로직/유틸 분리, SOLID 지향 모듈 설계
+**Key Highlights**
 
----
-
-## ✨ 기능
-
-### 핵심 기능
-- 📦 패키지 관리: 설치/삭제, 상세 정보 보기, 시스템 업데이트/업그레이드
-- 🔍 스마트 검색: apt 캐시 기반 검색과 필터링
-- 🎨 현대적 TUI: 깔끔한 ncurses UI, 선택 강조, 터미널 크기 대응, 부드러운 페이지네이션
-
-### 기술 하이라이트
-- ⚙️ 효율적 빌드: `-O2` 최적화
-- 🔒 보안 강화: 화이트리스트 기반 입력 검증으로 쉘 인젝션 차단
-- 🧩 모듈 구조: UI/로직/유틸/상수 분리
-- 💾 메모리 안정성: 중앙집중형 해제, 누수 방지
-- 🛡️ 오류 처리: 포괄적인 예외/에러 경로 처리
+* Lightweight design: simple, stable behavior with `-O2` optimized C code
+* Security-first: input validation preventing command injection
+* Usability: Vim-style keybindings (j/k, gg/G, /, i, d, u)
+* Modular architecture: separation of UI / logic / utilities following SOLID principles
 
 ---
 
-## 🚀 설치
+## ✨ Features <a name="features"></a>
 
-### 사전 준비 (Ubuntu/Debian)
+### Core Capabilities
+
+* 📦 Package management — install, remove, show details, and run system update/upgrade
+* 🔍 Smart search — apt-cache–based package lookup and filtering
+* 🎨 Modern TUI — clean ncurses interface, adaptive layout, smooth pagination
+
+### Technical Highlights
+
+* ⚙️ Efficient build with `-O2` optimization
+* 🔒 Whitelist-based input validation (prevents shell injection)
+* 🧩 Modular structure separating UI / logic / utils / constants
+* 💾 Centralized memory management and leak prevention
+* 🛡️ Robust error handling across all execution paths
+
+---
+
+## 🚀 Installation <a name="installation"></a>
+
+### Prerequisites (Ubuntu/Debian)
+
 ```bash
 sudo apt-get update
 sudo apt-get install build-essential libncurses5-dev libncursesw5-dev
-gcc --version  # C11 지원 gcc 권장
+gcc --version  # C11-compatible GCC recommended
 ```
 
-### 빌드
+### Build
+
 ```bash
 git clone https://github.com/bogamie/Linux-package-manager.git
 cd Linux-package-manager
-make         # 릴리스 빌드 (최적화)
-./package_manager       # 실행
+make          # Release build (optimized)
+./package_manager
 ```
 
-### 빌드 옵션
+### Build Options
+
 ```bash
-make          # 표준 빌드 (-O2)
-make debug    # 디버그 빌드 (-g)
-make clean    # 산출물 정리
-make rebuild  # 클린 후 빌드
-make help     # 사용 가능한 명령 보기
+make          # Standard build (-O2)
+make debug    # Debug build (-g)
+make clean    # Remove build artifacts
+make rebuild  # Clean and rebuild
+make help     # Show available targets
 ```
 
 ---
 
-## 💻 사용법
+## 💻 Usage <a name="usage"></a>
 
-### 빠른 시작
+### Quick Start
+
 ```bash
-./package_manager       # 실행
-./package_manager -help # 도움말
-./package_manager -U    # 시작 시 시스템 업데이트/업그레이드 수행 (sudo 필요)
+./package_manager         # Run
+./package_manager -help   # Display help
+./package_manager -U      # Auto update/upgrade (sudo required)
 ```
 
-### 키보드 단축키
+### Keyboard Shortcuts
 
-| 키 | 동작 | 설명 |
-|---|---|---|
-| `j` | 아래로 | 다음 패키지 |
-| `k` | 위로 | 이전 패키지 |
-| `gg` | 맨 위 | 첫 항목으로 이동 |
-| `G` | 맨 아래 | 마지막 항목으로 이동 |
-| `Enter` | 상세 보기 | 선택 항목 정보 |
-| `i` | 설치 | 선택 패키지 설치 |
-| `d` | 삭제 | 선택 패키지 제거 |
-| `u` | 업데이트 | 시스템 업데이트/업그레이드 |
-| `/` | 검색 | 패키지 검색 |
-| `q` | 종료 | 프로그램 종료 |
+| Key     | Action  | Description                   |
+| ------- | ------- | ----------------------------- |
+| `j`     | Down    | Move to next package          |
+| `k`     | Up      | Move to previous package      |
+| `gg`    | Top     | Jump to first entry           |
+| `G`     | Bottom  | Jump to last entry            |
+| `Enter` | Details | View package details          |
+| `i`     | Install | Install selected package      |
+| `d`     | Delete  | Remove selected package       |
+| `u`     | Update  | Perform system update/upgrade |
+| `/`     | Search  | Search for a package          |
+| `q`     | Quit    | Exit program                  |
 
-### 예시
-설치
-```
-1) ./package_manager 실행 → 2) j/k로 항목 이동 → 3) 'i' → 4) sudo 비밀번호 입력
-```
+### Examples
 
-검색
+**Install**
+
 ```
-1) '/' → 2) 패키지명 입력(예: "vim") → 3) j/k로 탐색 → 4) Enter로 상세 보기
+1) Run ./package_manager → 2) Move with j/k → 3) Press 'i' → 4) Enter sudo password
 ```
 
-### 실행 옵션
+**Search**
 
-| 옵션 | 설명 |
-|------|------|
-| `-help`, `--help` | 도움말 출력 후 종료 |
-| `-U`, `--auto-update` | 시작 직후 시스템 업데이트 & 업그레이드 수행 (sudo 비밀번호 필요) |
+```
+1) Press '/' → 2) Enter package name (e.g. "vim") → 3) Navigate with j/k → 4) Press Enter for details
+```
 
-기본 실행(`./package_manager`)은 시작 시 sudo 비밀번호를 요구하지 않습니다. 설치/삭제(i/d) 또는 시스템 업데이트(u) 기능을 사용할 때만 sudo 권한이 필요합니다.
+### Execution Options
+
+| Option                | Description                                           |
+| --------------------- | ----------------------------------------------------- |
+| `-help`, `--help`     | Print help and exit                                   |
+| `-U`, `--auto-update` | Automatically update & upgrade system (requires sudo) |
+
+The default execution (`./package_manager`) does **not** require sudo.
+Root privileges are only needed when performing **install (i)**, **remove (d)**, or **update (u)** actions.
 
 ---
 
-## 🖼️ 스크린샷
+## 🖼️ Screenshots <a name="screenshots"></a>
 
 <div align="center">
 
-![메인 목록 화면](screenshot/Screenshot%20from%202025-01-14%2015-43-08.png)
+![Main Package List](screenshot/Screenshot%20from%202025-01-14%2015-43-08.png)
 
-| 설치 | 삭제 | 상세 정보 |
-|---|---|---|
-| ![패키지 설치](screenshot/Screenshot%20from%202025-01-14%2015-47-03.png) | ![패키지 삭제](screenshot/Screenshot%20from%202025-01-14%2015-47-09.png) | ![Vim 키 예시](screenshot/Screenshot%20from%202025-01-14%2015-47-23.png) |
+| Install                                                              | Remove                                                              | Details                                                              |
+| -------------------------------------------------------------------- | ------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| ![Install](screenshot/Screenshot%20from%202025-01-14%2015-47-03.png) | ![Remove](screenshot/Screenshot%20from%202025-01-14%2015-47-09.png) | ![Details](screenshot/Screenshot%20from%202025-01-14%2015-47-23.png) |
 
 </div>
 
 ---
 
-## 🔒 보안
+## 🔒 Security <a name="security"></a>
 
-화이트리스트 기반 입력 검증으로 쉘 메타문자와 리디렉션, 따옴표, 역슬래시 등을 차단합니다.
+The application validates all user input using a **strict whitelist policy**, blocking any shell metacharacters, redirection symbols, quotes, or escape sequences.
 
-허용 문자
-- 영숫자: `a-z`, `A-Z`, `0-9`
-- 특수: `-`, `.`, `_`, `+`, `:`
+**Allowed Characters**
 
-차단 문자(예)
-- 메타: `;`, `|`, `&`, `$`, `` ` ``
-- 리디렉션: `<`, `>`, `>>`, `<<`
-- 인용부호: `'`, `"`
-- 괄호/역슬래시: `()`, `\`
+* Alphanumeric: `a-z`, `A-Z`, `0-9`
+* Special: `-`, `.`, `_`, `+`, `:`
 
-길이 제한
-- 패키지명 ≤ 255, 검색어 ≤ 256, 커맨드 버퍼 512
+**Blocked Examples**
+
+* Metacharacters: `;`, `|`, `&`, `$`, `` ` ``
+* Redirection: `<`, `>`, `>>`, `<<`
+* Quotes: `'`, `"`
+* Others: `()`, `\`
+
+**Length Limits**
+
+* Package name ≤ 255
+* Search query ≤ 256
+* Command buffer ≤ 512
 
 ---
 
-## 🏗️ 아키텍처
+## 🏗️ Architecture <a name="architecture"></a>
 
 ```
 src/
-├── main.c              # 진입점
-├── package_manager.c   # 패키지 관리 로직 (dpkg/apt)
-├── package_manager.h   # 인터페이스
-├── ui.c                # ncurses 렌더링
-├── ui.h                # UI 인터페이스
-├── utils.c             # 유틸리티(검증/메모리 등)
-├── utils.h             # 유틸 인터페이스
-└── constants.h         # 상수 정의
+├── main.c              # Entry point
+├── package_manager.c   # Core logic (dpkg/apt integration)
+├── package_manager.h   # Interface definition
+├── ui.c                # ncurses rendering layer
+├── ui.h                # UI interface
+├── utils.c             # Utilities (validation, memory, etc.)
+├── utils.h             # Utility interface
+└── constants.h         # Constant definitions
 ```
 
-설계 원칙
-- 관심사 분리(SoC), SOLID 지향
-- 에러 핸들링 경로 일관화, 안전한 메모리 해제
+**Design Principles**
 
-예시 자료구조
+* Separation of concerns (SoC) and SOLID-oriented modularity
+* Unified error-handling paths and safe memory release
+
+**Example Data Structure**
+
 ```c
 typedef struct Package {
-	char *name;        // 패키지명
-	char *version;     // 버전
-	char *description; // 설명
+    char *name;        // Package name
+    char *version;     // Version
+    char *description; // Description
 } Package;
 ```
 
 ---
 
-## 🛠️ 기술 상세
+## 🛠️ Technical Details <a name="technical-details"></a>
 
-컴파일 플래그
+**Compile Flags**
+
 ```makefile
 CFLAGS = -Wall -Wextra -O2 -std=c11
 ```
 
-의존성
-- ncurses, dpkg-query, apt/apt-get, apt-cache
+**Dependencies**
 
-메모리/오류 처리
-- 중앙집중 해제(`freePackages`), 안전 문자열 복제, NULL-세이프 해제
-- `popen/pclose` 실패 처리, 터미널 크기 검증, 안정적인 예외 처리
+* ncurses, dpkg-query, apt/apt-get, apt-cache
 
----
+**Memory & Error Handling**
 
-## 📊 동작 특성
-
-- 동작 성능은 하드웨어, 네트워크, 설치된 패키지 수 등에 따라 달라질 수 있습니다.
-- 검색 기능은 apt/apt-cache 호출 특성상 환경에 따라 느리게 느껴질 수 있습니다.
-- 필요 시 비동기 검색, 캐시 고도화 등으로 개선 여지가 있습니다.
+* Centralized deallocation (`freePackages`), safe string duplication, NULL-safe free
+* `popen/pclose` error handling, terminal size validation, graceful error recovery
 
 ---
 
-## 🧪 테스트
+## 📊 Performance Notes <a name="performance"></a>
 
-수동 테스트 체크리스트
-- [x] 목록/탐색, 설치/삭제(sudo 필요)
-- [x] 시스템 업데이트
-- [x] 유효/무효 입력 검색(보안 검증)
-- [x] 터미널 리사이즈 처리
-- [x] 메모리 누수 점검(valgrind)
+* Performance varies with hardware, network speed, and number of installed packages.
+* Searching can appear slow due to `apt-cache` behavior.
+* Future improvements may include asynchronous search or enhanced caching.
 
-보안 테스트 예
+---
+
+## 🧪 Testing <a name="testing"></a>
+
+**Manual Test Checklist**
+
+* [x] List navigation, install/remove (sudo required)
+* [x] System update/upgrade
+* [x] Valid/invalid input validation (security)
+* [x] Terminal resize handling
+* [x] Memory leak test (valgrind)
+
+**Security Test Example**
+
 ```bash
-# 예: test; rm -rf /tmp/test #  → 입력 거부가 되어야 함
+# Example: test; rm -rf /tmp/test  → should be rejected
 ```
 
 ---
 
-## 📄 라이선스
+## 📄 License <a name="license"></a>
 
-MIT License (c) 2025 bogamie
+MIT License © 2025 bogamie
 
 ---
